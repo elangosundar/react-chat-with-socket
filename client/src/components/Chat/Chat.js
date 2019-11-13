@@ -16,6 +16,13 @@ const Chat = ({ location }) => {
 
         setName(name);
         setRoom(room);
+
+        socket.emit('join', { name, room}, ({error}) => {
+            // callback 하기
+            // {} 하는 이유는 오브젝트를 값으로 변환하기 위해 사용
+            alert(error)
+        });
+
         // 1번만 렌더되기 위해 사용
     }, [ENDPOINT, location.search])
     return(
