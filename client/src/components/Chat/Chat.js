@@ -2,11 +2,15 @@ import React, { useState, useEffect} from 'react';
 import queryString from 'query-string';
 import io from 'socket.io-client';
 
+import './Chat.css'
+
 let socket;
 
 const Chat = ({ location }) => {
     const [name, setName] = useState('');
     const [room, setRoom] = useState('');
+    const [message, setMessage] = useState([]);
+    const [messages, setMessages] = useState([]);
     const ENDPOINT = 'localhost:5000';
     useEffect(() => {
         // location : url으로서 router가 전달해준다.
@@ -27,8 +31,33 @@ const Chat = ({ location }) => {
         }
         // 1번만 렌더되기 위해 사용
     }, [ENDPOINT, location.search])
+
+    useEffect(() => {
+        socket.on('message', (message) => {
+            setMessages([...messages, message]);
+        })
+    }, [messages])
+
+    const sendMessage = (event) => {
+        event.preventDefault();
+
+        if(message) {
+            socket.emit('sendMessage', message, () => setMessage(''));
+        }
+    }
+
+    console.log(message, messages);
+
     return(
-        <h1>Chat</h1>
+        <div className="outerContainer">
+            <div className="container">
+                <input
+                    value = {message}
+                    onChange = {(event) => setMessage(event.target.value)}
+                    onKeyPress={event => event.key === 'Enter' ? sendMessage(event) : null}
+                />
+            </div>
+        </div>
     )
 }
 
